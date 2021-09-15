@@ -691,18 +691,21 @@ contract TacoParty is ERC20("TacoParty", "TACO"), Ownable {
 
     constructor() {
         _mint(address(msg.sender), 1000 ether);
-        minted+=1000 ether;
+        // minted+=1000 ether;   // fix for low severity Paladin finding
+        minted = minted.add(1000 ether);
     }
 
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
-        minted+=_amount;
+        // minted+=_amount;  // fix for low severity Paladin finding
+        minted = minted.add(_amount);
     }
 
     function burn(uint256 _amount) public {
         require (balanceOf(msg.sender)>=_amount);
         _burn(msg.sender, _amount);
-        burned+=_amount;
+        // burned+=_amount;  // fix for low severity Paladin finding
+        burned = burned.add(_amount);
     }
 
     function getOwner() external view returns (address) {

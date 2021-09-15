@@ -1541,7 +1541,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     // SH13LD tokens created per block.
     uint256 public tacoPerBlock = 1 ether;
     // Maximum emission rate
-    uint256 public maxEmissionRate = 1 ether;
+    uint256 public constant maxEmissionRate = 1 ether;
     // Bonus muliplier for early taco makers.
     uint256 public constant BONUS_MULTIPLIER = 1;
     // Maximum emission rate (recommended by Paladin)
@@ -1561,7 +1561,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     uint public bottomPrice = 1; // 1$
     uint public curveRate = 5;
     uint public lastBlockUpdate = 0;
-    uint public emissionUpdateInterval = 50; // approx 5 mins at 2 blocks/seconds (Paladin high severity finding fix)
+    uint public emissionUpdateInterval = 50; // now approx 5 mins at 2 blocks/seconds (Paladin high severity finding fix)
 
     event Harvest(address indexed user, uint256 indexed pid, uint256 amount);
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
