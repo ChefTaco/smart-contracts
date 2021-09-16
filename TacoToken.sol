@@ -1,7 +1,3 @@
-/**
- *Submitted for verification at polygonscan.com on 2021-08-02
-*/
-
 // SPDX-License-Identifier: UNLICENSED
 
 /*

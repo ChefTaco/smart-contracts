@@ -1471,7 +1471,7 @@ contract ERC20 is Context, IERC20 {
 pragma solidity 0.7.6;
 
 
-contract TacoParty is ERC20("TacoParty", "SH13LD"), Ownable {
+contract TacoParty is ERC20("TacoParty", "TACO"), Ownable {
     
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
@@ -1489,10 +1489,10 @@ pragma solidity 0.7.6;
 
 
 
-// MasterChef is the master of TacoParty. He can make SH13LD and he is a fair guy.
+// MasterChef is the master of TacoParty. He can make TACO and he is a fair guy.
 //
 // Note that it's ownable and the owner wields tremendous power. The ownership
-// will be transferred to a governance smart contract once SH13LD is sufficiently
+// will be transferred to a governance smart contract once TACO is sufficiently
 // distributed and the community can show to govern itself.
 //
 // Have fun reading it. Hopefully it's bug-free. God bless.
@@ -1506,7 +1506,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         uint256 amount;         // How many LP tokens the user has provided.
         uint256 rewardDebt;     // Reward debt. See explanation below.
         //
-        // We do some fancy math here. Basically, any point in time, the amount of SH13LD
+        // We do some fancy math here. Basically, any point in time, the amount of TACO
         // entitled to a user but is pending to be distributed is:
         //
         //   pending reward = (user.amount * pool.accTacoPerShare) - user.rewardDebt
@@ -1521,9 +1521,9 @@ contract MasterChef is Ownable, ReentrancyGuard {
     // Info of each pool.
     struct PoolInfo {
         IERC20 lpToken;           // Address of LP token contract.
-        uint256 allocPoint;       // How many allocation points assigned to this pool. SH13LD to distribute per block.
-        uint256 lastRewardBlock;  // Last block number that SH13LD distribution occurs.
-        uint256 accTacoPerShare;   // Accumulated SH13LD per share, times 1e12. See below.
+        uint256 allocPoint;       // How many allocation points assigned to this pool. TACO to distribute per block.
+        uint256 lastRewardBlock;  // Last block number that TACO distribution occurs.
+        uint256 accTacoPerShare;   // Accumulated TACO per share, times 1e12. See below.
         uint16 depositFeeBP;      // Deposit fee in basis points
     }
 
@@ -1538,7 +1538,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
     address public burnaddr;
     // NFT address
     address public nftaddr = address(0x0);
-    // SH13LD tokens created per block.
+    // TACO tokens created per block.
     uint256 public tacoPerBlock = 1 ether;
     // Maximum emission rate
     uint256 public constant maxEmissionRate = 1 ether;
@@ -1612,7 +1612,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         }));
     }
 
-    // Update the given pool's SH13LD allocation point and deposit fee. Can only be called by the owner.
+    // Update the given pool's TACO allocation point and deposit fee. Can only be called by the owner.
     function set(uint256 _pid, uint256 _allocPoint, uint16 _depositFeeBP, bool _withUpdate) public onlyOwner {
         require(_depositFeeBP <= 400, "set: Never more than 4% fees.");
         if (_withUpdate) {
@@ -1628,7 +1628,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         return _to.sub(_from).mul(BONUS_MULTIPLIER);
     }
 
-    // View function to see pending SH13LD on frontend.
+    // View function to see pending TACO on frontend.
     function pendingTaco(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
@@ -1772,7 +1772,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         emit EmergencyWithdraw(msg.sender, _pid, amount);
     }
 
-    // Safe taco transfer function, just in case if rounding error causes pool to not have enough SH13LD.
+    // Safe taco transfer function, just in case if rounding error causes pool to not have enough TACO.
     function safeTacoTransfer(address _to, uint256 _amount) internal {
         uint256 tacoBal = tacoparty.balanceOf(address(this));
         bool transferSuccess = false;
@@ -1879,6 +1879,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
 
     // For checking prices to link emission rate
     function setUsdcTacoLPAddress(address _address) public onlyOwner {
+        require (_address!=address(0));  // added for good measure
         usdcTacoLP = _address;
     }
 
