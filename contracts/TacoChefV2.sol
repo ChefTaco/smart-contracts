@@ -66,7 +66,7 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
         uint256 lpSupply;
     }
 
-    uint256 public tacoMaximumSupply = 500 * (10 ** 3) * (10 ** 18); // 500,000 taco
+    uint256 public tacoMaximumSupply = 100 * (10 ** 3) * (10 ** 18); // 100,000 taco
 
     // The TACO TOKEN!
     TacoParty public immutable taco;

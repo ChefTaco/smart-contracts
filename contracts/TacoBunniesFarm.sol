@@ -1,24 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+// Stock PCS NFT farm, which will be replaced prior to enablement on the site.
 
-// File: @openzeppelin/contracts/GSN/Context.sol
-// File: @openzeppelin/contracts/access/Ownable.sol
-// File: @openzeppelin/contracts/math/SafeMath.sol
-// File: @pancakeswap/pancake-swap-lib/contracts/token/BEP20/IBEP20.sol
-// File: @openzeppelin/contracts/utils/Address.sol
-// File: contracts/utils/SafeBEP20.sol
-// File: @openzeppelin/contracts/utils/Counters.sol
-// File: @openzeppelin/contracts/introspection/IERC165.sol
-// File: @openzeppelin/contracts/token/ERC721/IERC721.sol
-// File: @openzeppelin/contracts/token/ERC721/IERC721Metadata.sol
-// File: @openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol
-// File: @openzeppelin/contracts/token/ERC721/IERC721Receiver.sol
-// File: @openzeppelin/contracts/introspection/ERC165.sol
-// File: @openzeppelin/contracts/utils/EnumerableSet.sol
-// File: @openzeppelin/contracts/utils/EnumerableMap.sol
-// File: @openzeppelin/contracts/utils/Strings.sol
-// File: @openzeppelin/contracts/token/ERC721/ERC721.sol
+pragma solidity ^0.8.0;
 
 import "contracts/TacoBunnies.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
