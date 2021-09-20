@@ -1,0 +1,15 @@
+node_modules
+.env
+package-lock.json
+package.json
+
+#Hardhat files
+cache
+artifacts
+scripts
+test
+Greeter.sol
+hardhat.config.js
+
+secrets.json
+*-removed

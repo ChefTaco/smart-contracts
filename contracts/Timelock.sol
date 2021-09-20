@@ -2,8 +2,6 @@
 
 // File: @openzeppelin/contracts/math/SafeMath.sol
 
-
-
 pragma solidity ^0.7.6;
 
 /**
