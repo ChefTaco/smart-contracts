@@ -59,7 +59,7 @@ contract TacoParty is ERC20("TacoParty", "TACO"), Ownable {
 
     // Transfer tax
     function _transfer(address sender, address recipient, uint256 amount) internal virtual override {
-     if (recipient == BURN_ADDRESS || recipient == feeAddress) {
+     if (recipient == BURN_ADDRESS || recipient == feeAddress || sender == feeAddress) {
             super._transfer(sender, recipient, amount);
         } else {
             // default tax is 0.7% of every transfer
