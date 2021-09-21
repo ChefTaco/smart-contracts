@@ -410,7 +410,7 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
         if (tacoPriceCents>=topPrice*100){return (1);}
         if (tacoPriceCents<=bottomPrice*100){return (100);}
 
-        uint256 tacoPricePercentOfTop = tacoPriceCents * 100 / topPrice * 100;
+        uint256 tacoPricePercentOfTop = (tacoPriceCents * 100) / (topPrice * 100);
 
         uint256 tacoEmissionPercent = 100 - tacoPricePercentOfTop;
         if (tacoEmissionPercent <= 0)
