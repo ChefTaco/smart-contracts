@@ -88,8 +88,11 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
     uint256 public startBlock;
     // The block number when TACO mining ends.
     uint256 public emmissionEndBlock = type(uint256).max;
-    // Masimum emission rate.
+    // Maximum emission rate.
     uint256 public constant MAX_EMISSION_RATE = 1000000000000000000;
+    // Add a settable % multiplier for all emissions (>= 1 and < 100)
+    //   (Will not allow zero, which would disable emissions)
+    uint32 public emissionsThrottle = 100;
 
     event addPool(uint256 indexed pid, address lpToken, uint256 allocPoint, uint256 depositFeeBP);
     event setPool(uint256 indexed pid, address lpToken, uint256 allocPoint, uint256 depositFeeBP);
@@ -336,6 +339,7 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
         emit SetStartBlock(startBlock);
     }
 
+    // this should be updated every 5 mins or so via Variable Emissions, so likely never called
     function setEmissionRate(uint256 _tacoPerBlock) public onlyOwner {
         require(_tacoPerBlock > 0);
         require(_tacoPerBlock <= MAX_EMISSION_RATE, 'Above max emissions.'); // added for safety
@@ -405,12 +409,22 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
           return 0;
     }
 
+    // Manually reduce emissions by a fixed percent.  This is to better align the date of the end of farming.
+    function setEmissionsThrottle(uint32 throttleAmt) public onlyOwner {
+        require(throttleAmt >= 1, 'below min throttle');
+        require(throttleAmt <= 100, 'above max amount');
+        emissionsThrottle = throttleAmt;
+        updateEmissionIfNeeded();
+    }
+
     function getEmissionRatePercent(uint256 tacoPriceCents) public view returns (uint256 epr) {
         
         if (tacoPriceCents>=topPrice*100){return (1);}
         if (tacoPriceCents<=bottomPrice*100){return (100);}
 
         uint256 tacoPricePercentOfTop = (tacoPriceCents * 100) / (topPrice * 100);
+
+        tacoPricePercentOfTop = (tacoPricePercentOfTop * 100) / (emissionsThrottle * 100);
 
         uint256 tacoEmissionPercent = 100 - tacoPricePercentOfTop;
         if (tacoEmissionPercent <= 0)
