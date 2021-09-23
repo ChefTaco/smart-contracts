@@ -2,20 +2,17 @@
 
 // Stock PCS NFT farm, which will be replaced prior to enablement on the site.
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "contracts/TacoBunnies.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract TacoBunniesFarm is Ownable {
-    using SafeMath for uint8;
-    using SafeMath for uint256;
 
     using SafeERC20 for IERC20;
 
-    TacoBunnies public pancakeBunnies;
-    IERC20 public cakeToken;
+    TacoBunnies public tacoBunnies;
+    IERC20 public tacoToken;
 
     // Map if address can claim a NFT
     mapping(address => bool) public canClaim;
@@ -26,14 +23,14 @@ contract TacoBunniesFarm is Ownable {
     // starting block
     uint256 public startBlockNumber;
 
-    // end block number to claim CAKEs by burning NFT
+    // end block number to claim TACOs by burning NFT
     uint256 public endBlockNumber;
 
     // number of total bunnies burnt
     uint256 public countBunniesBurnt;
 
-    // Number of CAKEs a user can collect by burning her NFT
-    uint256 public cakePerBurn;
+    // Number of TACOs a user can collect by burning her NFT
+    uint256 public tacoPerBurn;
 
     // current distributed number of NFTs
     uint256 public currentDistributedSupply;
@@ -65,17 +62,17 @@ contract TacoBunniesFarm is Ownable {
      * is defined as totalSupplyDistributed.
      */
     constructor(
-        IERC20 _cakeToken,
+        IERC20 _tacoToken,
         uint256 _totalSupplyDistributed,
-        uint256 _cakePerBurn,
+        uint256 _tacoPerBurn,
         // string memory _baseURI,
         string memory _ipfsHash,
         uint256 _endBlockNumber
     ) {
-        pancakeBunnies = new TacoBunnies();
-        cakeToken = _cakeToken;
+        tacoBunnies = new TacoBunnies();
+        tacoToken = _tacoToken;
         totalSupplyDistributed = _totalSupplyDistributed;
-        cakePerBurn = _cakePerBurn;
+        tacoPerBurn = _tacoPerBurn;
         // baseURI = _baseURI;
         endBlockNumber = _endBlockNumber;
 
@@ -90,17 +87,17 @@ contract TacoBunniesFarm is Ownable {
         bunnyIdURIs[4] = string(abi.encodePacked(_ipfsHash, "sparkle.json"));
 
         // Set token names for each bunnyId
-        pancakeBunnies.setBunnyName(0, "Swapsies");
-        pancakeBunnies.setBunnyName(1, "Drizzle");
-        pancakeBunnies.setBunnyName(2, "Blueberries");
-        pancakeBunnies.setBunnyName(3, "Circular");
-        pancakeBunnies.setBunnyName(4, "Sparkle");
+        tacoBunnies.setBunnyName(0, "Swapsies");
+        tacoBunnies.setBunnyName(1, "Drizzle");
+        tacoBunnies.setBunnyName(2, "Blueberries");
+        tacoBunnies.setBunnyName(3, "Circular");
+        tacoBunnies.setBunnyName(4, "Sparkle");
     }
 
     /**
-     * @dev Mint NFTs from the PancakeBunnies contract.
+     * @dev Mint NFTs from the TacoBunnies contract.
      * Users can specify what bunnyId they want to mint. Users can claim once.
-     * There is a limit on how many are distributed. It requires CAKE balance to be >0.
+     * There is a limit on how many are distributed. It requires TACO balance to be >0.
      */
     function mintNFT(uint8 _bunnyId) external {
         // Check msg.sender can claim
@@ -112,19 +109,19 @@ contract TacoBunniesFarm is Ownable {
             currentDistributedSupply < totalSupplyDistributed,
             "Nothing left"
         );
-        // Check whether user owns any CAKE
-        require(cakeToken.balanceOf(msg.sender) > 0, "Must own CAKE");
+        // Check whether user owns any TACO
+        require(tacoToken.balanceOf(msg.sender) > 0, "Must own TACO");
         // Check that the _bunnyId is within boundary:
         require(_bunnyId < numberOfBunnyIds, "bunnyId unavailable");
         // Update that msg.sender has claimed
         hasClaimed[msg.sender] = true;
 
         // Update the currentDistributedSupply by 1
-        currentDistributedSupply = currentDistributedSupply.add(1);
+        currentDistributedSupply += 1;
 
         string memory tokenURI = bunnyIdURIs[_bunnyId];
 
-        uint256 tokenId = pancakeBunnies.mint(
+        uint256 tokenId = tacoBunnies.mint(
             address(msg.sender),
             tokenURI,
             _bunnyId
@@ -134,20 +131,20 @@ contract TacoBunniesFarm is Ownable {
     }
 
     /**
-     * @dev Burn NFT from the PancakeBunnies contract.
-     * Users can burn their NFT to get a set number of CAKE.
+     * @dev Burn NFT from the TacoBunnies contract.
+     * Users can burn their NFT to get a set number of TACO.
      * There is a cap on how many can be distributed for free.
      */
     function burnNFT(uint256 _tokenId) external {
         require(
-            pancakeBunnies.ownerOf(_tokenId) == msg.sender,
+            tacoBunnies.ownerOf(_tokenId) == msg.sender,
             "Not the owner"
         );
         require(block.number < endBlockNumber, "too late");
 
-        pancakeBunnies.burn(_tokenId);
-        countBunniesBurnt = countBunniesBurnt.add(1);
-        cakeToken.safeTransfer(address(msg.sender), cakePerBurn);
+        tacoBunnies.burn(_tokenId);
+        countBunniesBurnt += 1;
+        tacoToken.safeTransfer(address(msg.sender), tacoPerBurn);
         emit BunnyBurn(msg.sender, _tokenId);
     }
 
@@ -170,12 +167,12 @@ contract TacoBunniesFarm is Ownable {
     }
 
     /**
-     * @dev It transfers the CAKE tokens back to the chef address.
+     * @dev It transfers the TACO tokens back to the chef address.
      * Only callable by the owner.
      */
-    function withdrawCake(uint256 _amount) external onlyOwner {
+    function withdrawTaco(uint256 _amount) external onlyOwner {
         require(block.number >= endBlockNumber, "too early");
-        cakeToken.safeTransfer(address(msg.sender), _amount);
+        tacoToken.safeTransfer(address(msg.sender), _amount);
     }
 
     /**
@@ -183,6 +180,6 @@ contract TacoBunniesFarm is Ownable {
      * to a new address.
      */
     function changeOwnershipNFTContract(address _newOwner) external onlyOwner {
-        pancakeBunnies.transferOwnership(_newOwner);
+        tacoBunnies.transferOwnership(_newOwner);
     }
 }

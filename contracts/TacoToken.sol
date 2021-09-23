@@ -12,16 +12,17 @@ MM88MMM ,adPPYYba,  ,adPPYba,  ,adPPYba,
 Website     https://tacoparty.finance
 */
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
 // Just a nice, simple Taco token. The burn() function is called by a Burner contract.
 
-contract TacoParty is ERC20("TacoParty", "TACO"), Ownable {
+contract TacoParty is ERC20, Ownable, ERC20Permit, ERC20Votes {
 
-    uint256 public minted;
     uint256 public burned;
 
     // Transfer tax rate in basis points. (0.7%)
@@ -34,23 +35,21 @@ contract TacoParty is ERC20("TacoParty", "TACO"), Ownable {
     address public constant BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
     address public immutable feeAddress;
 
-    constructor(address feeaddr) {
+    constructor(address feeaddr) ERC20("TacoParty", "TACO") ERC20Permit("TacoParty") {
         require(feeaddr != address(0x0), 'usdc is zero');
         feeAddress = feeaddr;
 
         _mint(address(msg.sender), MINT_AMOUNT);
-        minted = minted + MINT_AMOUNT;
     }
 
     function mint(address _to, uint256 _amount) public onlyOwner {
         _mint(_to, _amount);
-        minted = minted + _amount;
     }
 
     function burn(uint256 _amount) public {
         require (balanceOf(msg.sender)>=_amount);
         _burn(msg.sender, _amount);
-        burned = burned + _amount;
+        burned += _amount;
     }
 
     function getOwner() external view returns (address) {
@@ -74,10 +73,34 @@ contract TacoParty is ERC20("TacoParty", "TACO"), Ownable {
                         taxAmount == burnAmount + liquidityAmount, "sum error");
 
             super._transfer(sender, BURN_ADDRESS, burnAmount);
-            burned = burned + burnAmount;
+            burned += burnAmount;
             super._transfer(sender, feeAddress, liquidityAmount);
             super._transfer(sender, recipient, sendAmount);
             amount = sendAmount;
         }
+    }
+
+    // Required for Governance
+    // The following functions are overrides required by Solidity.
+
+    function _afterTokenTransfer(address from, address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._afterTokenTransfer(from, to, amount);
+    }
+
+    function _mint(address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._mint(to, amount);
+    }
+
+    function _burn(address account, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._burn(account, amount);
     }
 }

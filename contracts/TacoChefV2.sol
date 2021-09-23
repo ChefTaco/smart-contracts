@@ -91,6 +91,11 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
     // Maximum emission rate.
     // 1000000000000000000 is 1/block
     uint256 public constant MAX_EMISSION_RATE = 200000000000000000;  // 0.2/block
+    // Burner contract address
+    address public burnaddr;
+    // NFT address
+    address public nftaddr = address(0x0);
+
 
     event addPool(uint256 indexed pid, address lpToken, uint256 allocPoint, uint256 depositFeeBP);
     event setPool(uint256 indexed pid, address lpToken, uint256 allocPoint, uint256 depositFeeBP);
@@ -100,12 +105,14 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
     event SetEmissionRate(address indexed caller, uint256 previousAmount, uint256 newAmount);
     event SetFeeAddress(address indexed user, address indexed newAddress);
     event SetStartBlock(uint256 newStartBlock);
+    event SetStartPoolRewardBlock(uint256 pid);
     
     constructor(
         TacoParty _taco,
         address _feeAddress,
         uint256 _tacoPerBlock,
-        uint256 _startBlock
+        uint256 _startBlock,
+        address _burnaddr
     ) {
         require(_feeAddress != address(0), "!nonzero");
 
@@ -113,6 +120,7 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
         feeAddress = _feeAddress;
         tacoPerBlock = _tacoPerBlock;
         startBlock = _startBlock;
+        burnaddr = _burnaddr;
     }
 
     function poolLength() external view returns (uint256) {
@@ -130,7 +138,7 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
         // Make sure the provided token is ERC20
         _lpToken.balanceOf(address(this));
 
-        require(_depositFeeBP <= 401, "add: invalid deposit fee basis points");
+        require(_depositFeeBP <= 400, "add: invalid deposit fee basis points");
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -224,17 +232,23 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
             tacoReward = tacoMaximumSupply - taco.totalSupply();
 
         if (tacoReward > 0)
-            taco.mint(address(this), tacoReward);
+        {
+            if (nftaddr!=address(0x0)){
+                // Reserved for NFT address. 5% will be minted for the NFT system
+                taco.mint(nftaddr, tacoReward / 20);
+                taco.mint(burnaddr, tacoReward / 20);
+            }else{
+                taco.mint(burnaddr, tacoReward / 10);
+            }
 
-        // Added Mint to burn a % of rewards
-        taco.mint(address(0xdead), tacoReward / 20);
-        burnCounter += tacoReward / 20;
+            taco.mint(address(this), tacoReward);
+        }
 
         // The first time we reach Taco max supply we solidify the end of farming.
         if (taco.totalSupply() >= tacoMaximumSupply && emmissionEndBlock == type(uint256).max)
             emmissionEndBlock = block.number;
 
-        pool.accTacoPerShare = pool.accTacoPerShare + ((tacoReward * 1e12) / pool.lpSupply);
+        pool.accTacoPerShare += ((tacoReward * 1e12) / pool.lpSupply);
         pool.lastRewardBlock = block.number;
     }
 
@@ -290,6 +304,10 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
             pool.lpSupply = pool.lpSupply - _amount;
         }
         user.rewardDebt = (user.amount * pool.accTacoPerShare) / 1e12;
+
+        // Add a mass update for emissions, if needed
+        updateEmissionIfNeeded();
+
         emit Withdraw(msg.sender, _pid, _amount);
     }
 
@@ -327,6 +345,20 @@ contract MasterChefV2 is Ownable, ReentrancyGuard {
         require(_feeAddress != address(0), "!nonzero");
         feeAddress = _feeAddress;
         emit SetFeeAddress(msg.sender, _feeAddress);
+    }
+
+    //  Added to allow later enablement of a second NFT address
+    function setNFTAddress(address _address) public onlyOwner {
+        nftaddr = _address;
+    }
+
+    // If we change the start block, the last reward block is not also set, so this is needed.
+    function setStartPoolRewardBlock(uint256 _pid) external onlyOwner {
+        PoolInfo storage pool = poolInfo[_pid];
+
+        pool.lastRewardBlock = startBlock;
+
+        emit SetStartPoolRewardBlock(_pid);
     }
 
     function setStartBlock(uint256 _newStartBlock) external onlyOwner {

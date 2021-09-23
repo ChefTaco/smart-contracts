@@ -1,24 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-/*
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/interfaces/IERC165.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/interfaces/IERC721Metadata.sol";
-import "@openzeppelin/contracts/interfaces/IERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-*/
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 contract TacoBunnies is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
@@ -38,7 +25,7 @@ contract TacoBunnies is ERC721URIStorage, Ownable {
     // Map the bunnyName for a tokenId
     mapping(uint8 => string) private bunnyNames;
 
-    constructor() ERC721("Pancake Bunnies", "PB") {
+    constructor() ERC721("Taco Bunnies", "PB") {
     }
 
     function _baseURI() internal pure override returns (string memory) {
