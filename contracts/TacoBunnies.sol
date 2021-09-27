@@ -25,7 +25,7 @@ contract TacoBunnies is ERC721URIStorage, Ownable {
     // Map the bunnyName for a tokenId
     mapping(uint8 => string) private bunnyNames;
 
-    constructor() ERC721("Taco Bunnies", "PB") {
+    constructor() ERC721("Taco Bunnies", "TB") {
     }
 
     function _baseURI() internal pure override returns (string memory) {

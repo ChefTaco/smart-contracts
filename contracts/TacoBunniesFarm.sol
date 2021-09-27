@@ -48,14 +48,14 @@ contract TacoBunniesFarm is Ownable {
     uint8 private numberOfBunnyIds;
 
     // Event to notify when NFT is successfully minted
-    event BunnyMint(
+    event TacoBunnyMint(
         address indexed to,
         uint256 indexed tokenId,
         uint8 indexed bunnyId
     );
 
     // Event to notify when NFT is successfully minted
-    event BunnyBurn(address indexed from, uint256 indexed tokenId);
+    event TacoBunnyBurn(address indexed from, uint256 indexed tokenId);
 
     /**
      * @dev A maximum number of NFT tokens that is distributed by this contract
@@ -77,21 +77,17 @@ contract TacoBunniesFarm is Ownable {
         endBlockNumber = _endBlockNumber;
 
         // Other parameters initialized
-        numberOfBunnyIds = 5;
+        numberOfBunnyIds = 3;
 
         // Assign tokenURI to look for each bunnyId in the mint function
-        bunnyIdURIs[0] = string(abi.encodePacked(_ipfsHash, "swapsies.json"));
-        bunnyIdURIs[1] = string(abi.encodePacked(_ipfsHash, "drizzle.json"));
-        bunnyIdURIs[2] = string(abi.encodePacked(_ipfsHash, "blueberries.json"));
-        bunnyIdURIs[3] = string(abi.encodePacked(_ipfsHash, "circular.json"));
-        bunnyIdURIs[4] = string(abi.encodePacked(_ipfsHash, "sparkle.json"));
+        bunnyIdURIs[0] = string(abi.encodePacked(_ipfsHash, "nftimages/TacoMargarita.jpeg"));
+        bunnyIdURIs[1] = string(abi.encodePacked(_ipfsHash, "nftimages/TacoCat.jpeg"));
+        bunnyIdURIs[2] = string(abi.encodePacked(_ipfsHash, "nftimages/TacoSupreme.jpeg"));
 
         // Set token names for each bunnyId
-        tacoBunnies.setBunnyName(0, "Swapsies");
-        tacoBunnies.setBunnyName(1, "Drizzle");
-        tacoBunnies.setBunnyName(2, "Blueberries");
-        tacoBunnies.setBunnyName(3, "Circular");
-        tacoBunnies.setBunnyName(4, "Sparkle");
+        tacoBunnies.setBunnyName(0, "Taco Margarita");
+        tacoBunnies.setBunnyName(1, "Taco Cat");
+        tacoBunnies.setBunnyName(2, "Taco Supreme");
     }
 
     /**
@@ -127,7 +123,7 @@ contract TacoBunniesFarm is Ownable {
             _bunnyId
         );
 
-        emit BunnyMint(msg.sender, tokenId, _bunnyId);
+        emit TacoBunnyMint(msg.sender, tokenId, _bunnyId);
     }
 
     /**
@@ -145,7 +141,7 @@ contract TacoBunniesFarm is Ownable {
         tacoBunnies.burn(_tokenId);
         countBunniesBurnt += 1;
         tacoToken.safeTransfer(address(msg.sender), tacoPerBurn);
-        emit BunnyBurn(msg.sender, _tokenId);
+        emit TacoBunnyBurn(msg.sender, _tokenId);
     }
 
     /**
