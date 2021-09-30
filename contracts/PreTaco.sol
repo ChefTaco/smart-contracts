@@ -27,19 +27,19 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract PreTacoToken is ERC20('PreTacoToken', 'PRETACO'), ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
-    address  constant presaleAddress = 0x8d8B658E11090C0632E30974cf38a85CC9CD9722;
+    address  constant presaleAddress = 0xCf7Db495dFb74302870fFE4aC8D8d19550d97fA8;
     
     IERC20 public USDC = IERC20(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
     
     IERC20 preTacoToken = IERC20(address(this));
 
-    uint256 public salePrice = 3;
+    uint256 public salePrice = 250;  // sale price in cents
 
     uint256 public constant pretacoMaximumSupply = 5000 * (10 ** 18); //5k
 
     uint256 public pretacoRemaining = pretacoMaximumSupply;
     
-    uint256 public maxHardCap = 150000 * (10 ** 6); // 150k usdc
+    uint256 public maxHardCap = 15000 * (10 ** 6); // 15k usdc
 
     uint256 public constant maxPreTacoPurchase = 200 * (10 ** 18); // 200 pretaco
 
@@ -69,7 +69,7 @@ contract PreTacoToken is ERC20('PreTacoToken', 'PRETACO'), ReentrancyGuard, Owna
         require(_usdcSpent <= maxHardCap, "PreTaco Presale hardcap reached");
         require(userPreTacoTotally[msg.sender] < maxPreTacoPurchase, "user has already purchased too much pretaco");
 
-        uint256 pretacoPurchaseAmount = (_usdcSpent * 1000000000000) / salePrice;
+        uint256 pretacoPurchaseAmount = (_usdcSpent * 100000000000000) / salePrice;
 
         // if we dont have enough left, give them the rest.
         if (pretacoRemaining < pretacoPurchaseAmount)
